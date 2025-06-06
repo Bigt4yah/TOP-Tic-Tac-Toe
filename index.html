@@ -9,55 +9,13 @@
 <body>
 
     <div id="page-header">
-        My Library so far...
+        Let's play Tic Tac Toe!
     </div>
 
-    <button type="button" id="load" value="Load default items">Load Default Library</button>
+    <button type="button" id="startBtn" value="Start the game">Start the game</button>
 
-    <button type="button" id="openDialog" value="Add a new book">Add a new book</button>
+    <button type="button" id="restartBtn" value="Restart the game">Rstart the game</button> 
 
-    <table id="myLibraryTable">
-        <caption>My library</caption>
-        <thead>
-            <tr>
-                <th>Book ID</th>
-                <th>Name</th>
-                <th>Author</th>
-                <th>Number of Pages</th>
-                <th>Have I read it?</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-
-        </tbody>
-    </table>
-
-    <dialog id="form-dialog">
-        <form id="my-form" method="post">
-            <div class="formItem">
-                <label for="bookName">Book name:</label>
-                <input type="text" id="bookName" name="book-name" />
-            </div>
-            <div class="formItem">
-                <label for="bookAuthor">Book author:</label>
-                <input type="text" id="bookAuthor" name="book-author" />
-            </div>
-            <div class="formItem">
-                <label for="bookPages">Number of pages:</label>
-                <input type="text" id="bookPages" name="book-pages" />
-            </div>
-            <div class="formItem">
-                <label for="bookStatus">Have I read it?</label>
-                <input type="checkbox" id="bookStatus" name="book-status" />
-            </div>
-            <button type="submit" id="addBook" value="Submit">Submit</button>
-        </form>
-
-        
-
-    </dialog>
-    
-
-    <script src="library.js"></script>
+    <script src="ttt.js"></script>
 </body>
 </html>
