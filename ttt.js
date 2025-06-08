@@ -60,11 +60,21 @@ const gameBoard = (function () {
     
 })();
 
+// function to create the player object
+function Player(markerValue){
 
+    let playerMarker = markerValue;
+
+    return {playerMarker};
+}
 
 
 // Create a gameController object
 const gameController = (function() {
+
+    let player1 = Player("X");
+    let player2 = Player("O");
+    let players = [player1, player2];
 
     let winCondition1 = [1,2,3];
     let winCondition2 = [4,5,6];
@@ -86,6 +96,9 @@ const gameController = (function() {
     // initially player 1's turn
     let currentTurn;
 
+    // CurrentPlayersTurn
+    let CurrentPlayersTurn;
+
     // function to check if a player win happened
     function evaluatePlayerWin(){
         return getGameStatus();
@@ -94,6 +107,7 @@ const gameController = (function() {
     // function to start the game
     function startGame(){
         currentTurn = 1;
+        CurrentPlayersTurn = player1;
         console.log("Player 1's turn");
     }
 
@@ -103,10 +117,12 @@ const gameController = (function() {
     function changeTurn(){
         if(!evaluatePlayerWin()){
             if(currentTurn == 1){
-            currentTurn = 2;
+                CurrentPlayersTurn = players[currentTurn];
+                currentTurn = 2;
             }
             else{
                 currentTurn = 1;
+                CurrentPlayersTurn = players[0];
                 return "Player {currentTurn}'s turn";
             }
         }
@@ -168,8 +184,8 @@ const gameController = (function() {
     }
 
     // function for the player's turn
-    function PlayerTurn(marker, slot){
-        let playerDecision = gameBoard.setMarker(slot, marker);
+    function PlayerTurn(slot){
+        let playerDecision = gameBoard.setMarker(slot, CurrentPlayersTurn.marker);
 
         if(checkWin() || checkDraw()){
             setGameStatus("Complete!");
@@ -188,17 +204,4 @@ const gameController = (function() {
 })();
 
 
-// function to create the player object
-function Player(markerValue){
-
-    let playerMarker = markerValue;
-
-    // function for the player to make their turn
-    function selectSlot(slot){
-        gameController.PlayerTurn(playerMarker, slot);
-    }
-    return {playerMarker, selectSlot};
-}
-
-let player1 = Player('X');
-let player2 = Player('O');
+gameController.startGame();
