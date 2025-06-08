@@ -30,22 +30,6 @@ Tips:
 const gameBoard = (function () {
     let board = ["","","","","","","","",""];
 
-    let winCondition1 = [1,2,3];
-    let winCondition2 = [4,5,6];
-    let winCondition3 = [7,8,9];
-
-    let winCondition4 = [1,4,7];
-    let winCondition5 = [2,5,8];
-    let winCondition6 = [3,6,9];
-    
-    let winCondition7 = [1,5,9];
-    let winCondition8 = [3,5,7];
-
-    let allWinConditions = [winCondition1, winCondition2, winCondition3, winCondition4, winCondition4, winCondition5, winCondition6, winCondition7, winCondition8];
-
-    let winHappened;
-    let gameOver = false;
-
     // function to get the marker in the current slot
     function getSlot(slot) {
         return board[slot];
@@ -54,15 +38,8 @@ const gameBoard = (function () {
     // function to set the marker in the current slot
     function setMarker(slot, marker){
         if (getSlot(slot) == "") {
-            board[slot] = marker;
-            if(checkWin()){
-                gameOver = true;
-                return "${marker}'s win!";
-            }
-            else if(checkDraw()){
-                gameOver = true;
-                return "Draw!";
-            };
+            board[slot-1] = marker;
+            return true;
         }
         else {
             return "Slot already taken";
@@ -77,69 +54,50 @@ const gameBoard = (function () {
     // function to get the board
     function getBoard(){
         return board;
-    }
+    }    
 
-    // function to check if a win condition has occurred
-    function checkWinCondition(currentWinCondition){
-        let currentValue = board[currentWinCondition[0]];
-
-        if(currentValue != ""){
-            for(let i = 0; i < currentWinCondition.length; i++){
-                if(board[currentWinCondition[i]] == ""){
-                    break;
-                    return false;
-                }
-                else if(board[currentWinCondition[i]] == currentValue){
-                    continue;
-                }
-            }
-        }
-        else{
-            return false;
-        }
-        return true;
-    }
-
-    // function to evaluate all win conditions
-    function checkWin(){
-        winHappened =  allWinConditions.some(checkWinCondition);
-        return winHappened;
-    }
-
-    // function to check for a draw
-    function checkDraw(){
-        for(let i =1; i<board.length; i++){
-            if(board[i] == ""){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // function to return gameStatus
-    function getGameStatus(){
-        return gameOver;
-    }
-
-    return {getBoard, resetBoard, getSlot, setMarker, getGameStatus};
+    return {getBoard, resetBoard, getSlot, setMarker};
     
 })();
 
+
+
+
 // Create a gameController object
 const gameController = (function() {
+
+    let winCondition1 = [1,2,3];
+    let winCondition2 = [4,5,6];
+    let winCondition3 = [7,8,9];
+
+    let winCondition4 = [1,4,7];
+    let winCondition5 = [2,5,8];
+    let winCondition6 = [3,6,9];
+    
+    let winCondition7 = [1,5,9];
+    let winCondition8 = [3,5,7];
+
+    let allWinConditions = [winCondition1, winCondition2, winCondition3, winCondition4, winCondition4, winCondition5, winCondition6, winCondition7, winCondition8];
+
+    let winHappened;
+
+    let gameStatus;
 
     // initially player 1's turn
     let currentTurn;
 
     // function to check if a player win happened
     function evaluatePlayerWin(){
-        return gameBoard.getGameStatus();
+        return getGameStatus();
     }
 
     // function to start the game
     function startGame(){
         currentTurn = 1;
+        console.log("Player 1's turn");
     }
+
+    // function to repeat the last turn
 
     // function to change the currentTurn
     function changeTurn(){
@@ -162,7 +120,70 @@ const gameController = (function() {
         gameBoard.resetBoard();
     }
 
-    return {startGame, changeTurn};
+    // function to check if a win condition has occurred
+    function checkWinCondition(currentWinCondition){
+        let currentValue = gameBoard[currentWinCondition[0]];
+
+        if(currentValue != ""){
+            for(let i = 0; i < currentWinCondition.length; i++){
+                if(gameBoard[currentWinCondition[i]] == ""){
+                    break;
+                    return false;
+                }
+                else if(gameBoard[currentWinCondition[i]] == currentValue){
+                    continue;
+                }
+            }
+        }
+        else{
+            return false;
+        }
+        return true;
+    }
+
+    // function to evaluate all win conditions
+    function checkWin(){
+        winHappened =  allWinConditions.some(checkWinCondition);
+        return winHappened;
+    }
+
+    // function to check for a draw
+    function checkDraw(){
+        for(let i =1; i<gameBoard.length; i++){
+            if(gameBoard[i] == ""){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // function to return gameStatus
+    function getGameStatus(){
+        return gameStatus;
+    }
+
+    // function to set the gameStatus
+    function setGameStatus(status){
+        gameStatus = status;
+    }
+
+    // function for the player's turn
+    function PlayerTurn(marker, slot){
+        let playerDecision = gameBoard.setMarker(slot, marker);
+
+        if(checkWin() || checkDraw()){
+            setGameStatus("Complete!");
+        };
+
+        if(playerDecision != true){
+            return playerDecision;
+        }
+        else if (gameStatus != "Complete"){
+            changeTurn();
+        };        
+    }
+
+    return {startGame, changeTurn, PlayerTurn};
 
 })();
 
@@ -170,4 +191,14 @@ const gameController = (function() {
 // function to create the player object
 function Player(markerValue){
 
+    let playerMarker = markerValue;
+
+    // function for the player to make their turn
+    function selectSlot(slot){
+        gameController.PlayerTurn(playerMarker, slot);
+    }
+    return {playerMarker, selectSlot};
 }
+
+let player1 = Player('X');
+let player2 = Player('O');
