@@ -93,6 +93,8 @@ const gameController = (function() {
 
     let gameStatus;
 
+    let playerMarker;
+
     // initially player 1's turn
     let currentTurn;
 
@@ -111,8 +113,9 @@ const gameController = (function() {
     function startGame(){
         currentTurn = 1;
         CurrentPlayersTurn = player1;
+        playerMarker = player1.playerMarker;
         setGameStatus("In Progress");
-        console.log("Player 1's turn");
+        //console.log("Player 1's turn");
     }
 
     // function to repeat the last turn
@@ -123,13 +126,15 @@ const gameController = (function() {
             if(currentTurn == 1){
                 CurrentPlayersTurn = players[1];
                 currentTurn = 2;
+                playerMarker = player2.playerMarker;
                 console.log(`Player ${currentTurn}'s turn`);
             }
             else{
                 currentTurn = 1;
                 CurrentPlayersTurn = players[0];
+                playerMarker = player1.playerMarker;
                 console.log(`Player ${currentTurn}'s turn`);
-                return `Player {currentTurn}'s turn`;
+                //return `Player {currentTurn}'s turn`;
             }
         }
         else{
@@ -143,14 +148,13 @@ const gameController = (function() {
         CurrentPlayersTurn = players[0];
         currentTurn = 1;
         setGameStatus('');
-
     }
 
     // function to check if a win condition has occurred
     function checkWinCondition(currentWinCondition){
         let currentValue = gameBoard.getSlot(currentWinCondition[0]);
 
-        console.log(`CurrentValue = ${currentValue}`);
+        //console.log(`CurrentValue = ${currentValue}`);
 
         if(currentValue != '' && currentValue !== undefined){
             for(let i = 0; i < currentWinCondition.length; i++){
@@ -161,7 +165,7 @@ const gameController = (function() {
                 else if(slotValue != currentValue){
                     return false;
                 }
-                console.log(`checkWinCondition: gameBoard.getSlot(${currentWinCondition[i]}) == ${currentValue}`);
+                //console.log(`checkWinCondition: gameBoard.getSlot(${currentWinCondition[i]}) == ${currentValue}`);
             }
             return true;
         }        
@@ -179,7 +183,7 @@ const gameController = (function() {
         for(let i = 0; i < gameBoard.getBoard().length; i++){
             let slotValue = gameBoard.getSlot(i);
             if(slotValue == '' || slotValue === undefined){
-                console.log(`Draw check: slot ${i} is null. Not a draw!`);
+                //console.log(`Draw check: slot ${i} is null. Not a draw!`);
                 return false;
             }
         }
@@ -198,11 +202,17 @@ const gameController = (function() {
 
     // function for the player's turn
     function PlayerTurn(slot){
+
+        if(gameStatus == 'Complete'){
+            return false;
+        }
+
         let playerDecision = gameBoard.setMarker(slot, CurrentPlayersTurn.playerMarker);
 
         if(checkWin() || checkDraw()){
             setGameStatus("Complete");
             console.log('Game has completed!');
+            return gameStatus;
         };
 
         if(playerDecision != true){
@@ -210,24 +220,37 @@ const gameController = (function() {
         }
         else if (gameStatus != "Complete"){
             changeTurn();
+            return true;
         };        
     }
 
-    return {startGame, restartGame, changeTurn, PlayerTurn};
+    // function to retrieve the player marker -- to be used in the gameDisplayController
+    function getPlayerMarker(){
+        return playerMarker;
+    }
+
+    return {startGame, restartGame, changeTurn, PlayerTurn, getPlayerMarker};
 
 })();
-
-// Starting the game
-gameController.startGame();
-
 
 
 // Create the displayController object
 const gameDisplayController = (function(){
 
+    // Start Button element
+    const startBtn = document.querySelector("#startBtn");
 
-    //
+    // Restart Button element
+    const restartBtn = document.querySelector("#restartBtn");
+
+    // game-container element
+    const gameContainer = document.querySelector("#game-container");
+
+    // Players -- element to display player names
     const playerMsg = document.querySelector("#player-container");
+
+    // winner msg -- element to display the winner
+    const winnerMsg = document.querySelector("#winner-msg");
 
     // Player1 Form
     const player1Form = document.querySelector("#player1-form");
@@ -239,13 +262,14 @@ const gameDisplayController = (function(){
         e.preventDefault();
         player1Name = document.querySelector("#player1Name").value;
 
-        hideNameForm(player1Form);
+        hideElement(player1Form);
 
         player1Set = true;
 
         if(player2Set){
             let playerHeader = player1Name + ' vs ' + player2Name;
             playerMsg.textContent = playerHeader;
+            startGame();
         }
     })
 
@@ -259,27 +283,174 @@ const gameDisplayController = (function(){
         e.preventDefault();
         player2Name = document.querySelector("#player2Name").value;
 
-        hideNameForm(player2Form);
+        hideElement(player2Form);
         player2Set = true;
 
         if(player1Set){
             let playerHeader = player1Name + ' vs ' + player2Name;
             playerMsg.textContent = playerHeader;
+            startGame();
         }
 
     })
 
     // Function to hide forms
-    function hideNameForm(form){
-        if (form.style.display != "none"){
-            form.style.display = "none";
+    function hideElement(element){
+        if (element.style.display != "none"){
+            element.style.display = "none";
         }
     }
 
     
     // function to generate board
     function GenerateGameBoard(){
-        
+        const board = document.createElement('table');
+
+        let rows = 1;
+        let cells;
+        let newCells = 1;
+        while(rows < 4){
+            let newRow = document.createElement('tr');
+
+            // set properties of new row element
+            newRow.style.borderStyle = 'solid';
+            newRow.style.borderWidth = '1px';
+            newRow.style.borderColor = 'black';
+            newRow.style.borderCollapse = 'collapse';
+
+            // set cells variable to 1 -- used to loop through and create 3 cells per row
+            cells = 1;
+
+            while(cells < 4){
+                // Create new td element
+                let newCell = document.createElement('td');
+
+                // create variable to hold the newCells value (used for incrementing the id value)
+                let newCellValue = newCells;
+
+                // set the id of the newCell
+                let newID = `cell-${newCellValue}`;
+                newCell.id = newID;
+
+                // set properties of new td element
+                newCell.style.minHeight = '10px';
+                newCell.style.minWidth = '10px';
+                newCell.style.borderStyle = 'solid';
+                newCell.style.borderWidth = '1px';
+                newCell.style.borderColor = 'black';
+                newCell.style.borderCollapse = 'collapse';
+
+                // placeholder text within the new cell
+                newCell.innerText = '';
+
+                // add event listener to each cell
+                newCell.addEventListener("click", playerMove);
+
+                // append the newCell to the newRow
+                newRow.appendChild(newCell);
+
+                // increment variables
+                cells += 1;
+                newCells +=1;
+            }
+            // append newRow to board
+            board.appendChild(newRow);
+
+            // increment variables
+            rows++;
+        }
+
+        // Set properties of new table element
+        board.id = 'gameBoardTable';
+        board.style.minHeight = '100px';
+        board.style.minWidth = '100px';
+        board.style.maxHeight = '500px';
+        board.style.maxWidth = '500px';
+        board.style.borderStyle = 'solid';
+        board.style.borderWidth = '2px';
+        board.style.borderColor = 'black';
+        gameContainer.appendChild(board);
+    }
+
+    // Function to restart the game -- to be added to the Restart Button
+    function restartGame(){
+        gameController.restartGame();
+
+        const board = document.querySelector("#gameBoardTable");
+        gameContainer.removeChild(board);
+        winnerMsg.innerText = '';
+        startGame();
+    }
+
+    // Add event to Restart Button
+    restartBtn.addEventListener("click", restartGame);
+
+    // Function to start the game -- to be added to the Start Button
+    function startGame(){
+        if(player1Name == '' || player1Name === undefined){
+            player1Name = 'Player1';
+            player1Set = true;
+        }
+
+        if(player2Name == '' || player2Name === undefined){
+            player2Name = 'Player2';
+            player2Set = true;
+        }
+
+        let playerHeader = player1Name + ' vs ' + player2Name;
+        playerMsg.textContent = playerHeader;
+
+        // hide the start button
+        hideElement(startBtn);
+        hideElement(player1Form);
+        hideElement(player2Form);
+
+        // Generate the gameboard
+        GenerateGameBoard();
+
+        // start the game using the gameController
+        gameController.startGame();
+    }
+
+    // Add event to Start Button
+    startBtn.addEventListener("click", startGame);
+
+    // Function to get the substring returned after a specific character
+    function getCellNumber(strToLookFor, myStr){
+        const parts = myStr.split(strToLookFor);
+        if(parts.length < 1){
+            return `The string ${strToLookFor} cannot be found in ${myStr}`;
+        }
+        return parts[1];
+    }
+
+    // Function for cells in the table to listen for to place a marker in the table
+    function playerMove(e){
+        // get the ID of the element
+        let elementID = e.target.id;
+
+        // get the targeted Slot based off the ID of the element, looking for a hyphen
+        let targetSlot = parseInt(getCellNumber('-', elementID));
+
+        // get the player marker that needs to go in the element
+        let playerMarker = gameController.getPlayerMarker();        
+
+        // Make Player's Turn on the gameController
+        let validMove = gameController.PlayerTurn(targetSlot);
+
+        if(validMove == true){
+            // set the element innerText to the playerMarker
+            e.target.innerText = playerMarker;
+        }
+        else if(validMove == 'Complete'){
+            e.target.innerText = playerMarker;
+            if(playerMarker =='X'){
+                winnerMsg.innerText = `${player1Name} wins!`;
+            }
+            else{
+                winnerMsg.innerText = `${player2Name} wins!`;
+            }
+        }
     }
 
 })();

@@ -10,11 +10,13 @@
 
     <div id="page-header">
         Let's play Tic Tac Toe!
+
+        <button type="button" id="startBtn" value="Start the game">Start the game</button>
+        <button type="button" id="restartBtn" value="Restart the game">Restart the game</button> 
+
     </div>
 
-    <button type="button" id="startBtn" value="Start the game">Start the game</button>
-
-    <button type="button" id="restartBtn" value="Restart the game">Restart the game</button> 
+    
 
     <div id="game-container">
         <form id="player1-form" method="post">
@@ -31,8 +33,8 @@
                     <button type="submit" id="addPlayer2Name" value="Submit">Submit</button>
             </div>
         </form>
-
         <div id="player-container"></div>
+        <div id="winner-msg"></div>
 
     </div>
 
