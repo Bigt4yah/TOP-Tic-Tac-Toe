@@ -217,5 +217,69 @@ const gameController = (function() {
 
 })();
 
-
+// Starting the game
 gameController.startGame();
+
+
+
+// Create the displayController object
+const gameDisplayController = (function(){
+
+
+    //
+    const playerMsg = document.querySelector("#player-container");
+
+    // Player1 Form
+    const player1Form = document.querySelector("#player1-form");
+    const player1Submit = document.querySelector("#addPlayer1Name");
+    let player1Name;
+    let player1Set = false;
+    
+    player1Form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        player1Name = document.querySelector("#player1Name").value;
+
+        hideNameForm(player1Form);
+
+        player1Set = true;
+
+        if(player2Set){
+            let playerHeader = player1Name + ' vs ' + player2Name;
+            playerMsg.textContent = playerHeader;
+        }
+    })
+
+    // Player2 Form
+    const player2Form = document.querySelector("#player2-form");
+    const player2Submit = document.querySelector("#addPlayer2Name");
+    let player2Name;
+    let player2Set = false;
+
+    player2Form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        player2Name = document.querySelector("#player2Name").value;
+
+        hideNameForm(player2Form);
+        player2Set = true;
+
+        if(player1Set){
+            let playerHeader = player1Name + ' vs ' + player2Name;
+            playerMsg.textContent = playerHeader;
+        }
+
+    })
+
+    // Function to hide forms
+    function hideNameForm(form){
+        if (form.style.display != "none"){
+            form.style.display = "none";
+        }
+    }
+
+    
+    // function to generate board
+    function GenerateGameBoard(){
+        
+    }
+
+})();

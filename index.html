@@ -16,6 +16,26 @@
 
     <button type="button" id="restartBtn" value="Restart the game">Restart the game</button> 
 
+    <div id="game-container">
+        <form id="player1-form" method="post">
+            <div class="formItem">
+                <label for="player1Name">Player 1 name:</label>
+                <input type="text" id="player1Name" name="player1-name" />
+                <button type="submit" id="addPlayer1Name" value="Submit">Submit</button>
+            </div>
+        </form>       
+        <form id ="player2-form" method="post">
+            <div class="formItem">
+                    <label for="player2Name">Player 2 name:</label>
+                    <input type="text" id="player2Name" name="player2-name" />
+                    <button type="submit" id="addPlayer2Name" value="Submit">Submit</button>
+            </div>
+        </form>
+
+        <div id="player-container"></div>
+
+    </div>
+
     <script src="ttt.js"></script>
 </body>
 </html>
