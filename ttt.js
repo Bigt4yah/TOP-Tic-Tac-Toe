@@ -180,7 +180,7 @@ const gameController = (function() {
 
     // function to check for a draw
     function checkDraw(){
-        for(let i = 0; i < gameBoard.getBoard().length; i++){
+        for(let i = 1; i < gameBoard.getBoard().length; i++){
             let slotValue = gameBoard.getSlot(i);
             if(slotValue == '' || slotValue === undefined){
                 //console.log(`Draw check: slot ${i} is null. Not a draw!`);
@@ -209,11 +209,16 @@ const gameController = (function() {
 
         let playerDecision = gameBoard.setMarker(slot, CurrentPlayersTurn.playerMarker);
 
-        if(checkWin() || checkDraw()){
+        if(checkWin()){
             setGameStatus("Complete");
-            console.log('Game has completed!');
+            //console.log('Game has completed!');
             return gameStatus;
         };
+
+        if(checkDraw()){
+            setGameStatus('Draw');
+            return gameStatus;
+        }
 
         if(playerDecision != true){
             return playerDecision;
@@ -333,12 +338,14 @@ const gameDisplayController = (function(){
                 newCell.id = newID;
 
                 // set properties of new td element
-                newCell.style.minHeight = '10px';
-                newCell.style.minWidth = '10px';
+                newCell.style.height = '100px';
+                newCell.style.width = '100px';
                 newCell.style.borderStyle = 'solid';
                 newCell.style.borderWidth = '1px';
                 newCell.style.borderColor = 'black';
                 newCell.style.borderCollapse = 'collapse';
+                newCell.style.textAlign = 'center';
+                newCell.style.verticalAlign = 'middle';
 
                 // placeholder text within the new cell
                 newCell.innerText = '';
@@ -362,13 +369,13 @@ const gameDisplayController = (function(){
 
         // Set properties of new table element
         board.id = 'gameBoardTable';
-        board.style.minHeight = '100px';
-        board.style.minWidth = '100px';
-        board.style.maxHeight = '500px';
-        board.style.maxWidth = '500px';
+        board.style.height = '300px';
+        board.style.width = '300px';
         board.style.borderStyle = 'solid';
         board.style.borderWidth = '2px';
         board.style.borderColor = 'black';
+        board.style.tableLayout = 'fixed';
+
         gameContainer.appendChild(board);
     }
 
@@ -450,6 +457,9 @@ const gameDisplayController = (function(){
             else{
                 winnerMsg.innerText = `${player2Name} wins!`;
             }
+        }
+        else if (validMove == 'Draw'){
+            winnerMsg.innerText = "It's a draw!";
         }
     }
 
