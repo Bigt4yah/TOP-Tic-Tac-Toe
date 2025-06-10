@@ -28,27 +28,27 @@ Tips:
 
 // Create the Gameboard object
 const gameBoard = (function () {
-    let board = ["","","","","","","","",""];
+    let board = ['','','','','','','','',''];
 
     // function to get the marker in the current slot
     function getSlot(slot) {
-        return board[slot];
+        return board[slot -1];
     }
 
     // function to set the marker in the current slot
     function setMarker(slot, marker){
-        if (getSlot(slot) == "") {
+        if (getSlot(slot) == '') {
             board[slot-1] = marker;
             return true;
         }
         else {
-            return "Slot already taken";
+            return 'Slot already taken';
         }
     }
 
     // function to reset the board
     function resetBoard(){
-        board = ["","","","","","","","",""];
+        board = ['','','','','','','','',''];
     }
 
     // function to get the board
@@ -101,13 +101,17 @@ const gameController = (function() {
 
     // function to check if a player win happened
     function evaluatePlayerWin(){
-        return getGameStatus();
+        if(gameStatus == 'Complete'){
+            return true;
+        }
+        return false;
     }
 
     // function to start the game
     function startGame(){
         currentTurn = 1;
         CurrentPlayersTurn = player1;
+        setGameStatus("In Progress");
         console.log("Player 1's turn");
     }
 
@@ -117,44 +121,51 @@ const gameController = (function() {
     function changeTurn(){
         if(!evaluatePlayerWin()){
             if(currentTurn == 1){
-                CurrentPlayersTurn = players[currentTurn];
+                CurrentPlayersTurn = players[1];
                 currentTurn = 2;
+                console.log(`Player ${currentTurn}'s turn`);
             }
             else{
                 currentTurn = 1;
                 CurrentPlayersTurn = players[0];
-                return "Player {currentTurn}'s turn";
+                console.log(`Player ${currentTurn}'s turn`);
+                return `Player {currentTurn}'s turn`;
             }
         }
         else{
-            return "The game ended";
+            return 'The game ended';
         }
     }   
 
     // function to restart the game
     function restartGame(){
         gameBoard.resetBoard();
+        CurrentPlayersTurn = players[0];
+        currentTurn = 1;
+        setGameStatus('');
+
     }
 
     // function to check if a win condition has occurred
     function checkWinCondition(currentWinCondition){
-        let currentValue = gameBoard[currentWinCondition[0]];
+        let currentValue = gameBoard.getSlot(currentWinCondition[0]);
 
-        if(currentValue != ""){
+        console.log(`CurrentValue = ${currentValue}`);
+
+        if(currentValue != '' && currentValue !== undefined){
             for(let i = 0; i < currentWinCondition.length; i++){
-                if(gameBoard[currentWinCondition[i]] == ""){
-                    break;
+                let slotValue = gameBoard.getSlot(currentWinCondition[i]);
+                if(slotValue == '' || slotValue=== undefined){
                     return false;
                 }
-                else if(gameBoard[currentWinCondition[i]] == currentValue){
-                    continue;
+                else if(slotValue != currentValue){
+                    return false;
                 }
+                console.log(`checkWinCondition: gameBoard.getSlot(${currentWinCondition[i]}) == ${currentValue}`);
             }
-        }
-        else{
-            return false;
-        }
-        return true;
+            return true;
+        }        
+        return false;
     }
 
     // function to evaluate all win conditions
@@ -165,8 +176,10 @@ const gameController = (function() {
 
     // function to check for a draw
     function checkDraw(){
-        for(let i =1; i<gameBoard.length; i++){
-            if(gameBoard[i] == ""){
+        for(let i = 0; i < gameBoard.getBoard().length; i++){
+            let slotValue = gameBoard.getSlot(i);
+            if(slotValue == '' || slotValue === undefined){
+                console.log(`Draw check: slot ${i} is null. Not a draw!`);
                 return false;
             }
         }
@@ -185,10 +198,11 @@ const gameController = (function() {
 
     // function for the player's turn
     function PlayerTurn(slot){
-        let playerDecision = gameBoard.setMarker(slot, CurrentPlayersTurn.marker);
+        let playerDecision = gameBoard.setMarker(slot, CurrentPlayersTurn.playerMarker);
 
         if(checkWin() || checkDraw()){
-            setGameStatus("Complete!");
+            setGameStatus("Complete");
+            console.log('Game has completed!');
         };
 
         if(playerDecision != true){
@@ -199,7 +213,7 @@ const gameController = (function() {
         };        
     }
 
-    return {startGame, changeTurn, PlayerTurn};
+    return {startGame, restartGame, changeTurn, PlayerTurn};
 
 })();
 
